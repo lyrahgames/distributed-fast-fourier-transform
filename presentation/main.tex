@@ -1,0 +1,387 @@
+\input{pre}
+
+\ihead[]{Handout: \\ Fast Fourier Transform}
+\ohead[]{Markus Pawellek \\ markuspawellek@gmail.com}
+\cfoot[]{\newline\newline\newline\pagemark}
+
+\title{Handout - Fast Fourier Transform}
+\author{Markus Pawellek}
+\date{03.Februar 2016}
+
+\begin{document}
+	
+	\maketitle
+	% \tableofcontents
+	% \newpage
+	\thispagestyle{empty}
+	% \null
+	% \newpage
+	% \pagenumbering{arabic}
+
+	\section{Mathematische Grundlagen} % (fold)
+	\label{sec:mathematische_grundlagen}
+
+		% Alle Betrachtungen beziehen sich im Allgemeinen auf periodische Funktionen.
+		
+		% \begin{itemize}
+		% 	\item $T\in(0,\infty)$
+		% 	% \item $f:\SR\longrightarrow\SC$ ist $T$-periodisch
+		% 	\item $n\in\SN$
+		% 	\item $\mathrm{N}_{n} := \curlb{0,\ldots,n-1}$
+		% \end{itemize}
+
+		\begin{definition*}[periodische Funktionen]
+			Sei $T\in(0,\infty)$.
+			Eine Abbildung $f:\SR\longrightarrow\SC$ heißt dann $T$-periodisch, wenn für alle $x\in\SR$ gilt
+			$$ f(x) = f(x+T) $$
+			In diesem Falle nennt man $T$ auch die Periode von $f$ und $1/T$ auch die Frequenz von $f$.
+		\end{definition*}
+		Für die folgenden Aussagen soll $T\in(0,\infty)$ immer die Periode einer Funktion beschreiben.
+
+		\subsection{Fouriertransformation periodischer Funktionen} % (fold)
+		\label{sub:fouriertransformation_periodischer_funktionen}
+		
+			\begin{definition*}[Fouriertransformation]
+				% Sei $T\in(0,\infty)$.
+				Für eine $T$-periodische Funktion $f:\SR\longrightarrow\SC$, welche stückweise stetig differenzierbar ist, kann man die Fouriertransformation $\FF$ und ihre Inverse definieren durch
+				\begin{alignat*}{4}
+					&\forall k\in\SZ:\quad &\FF f(k) &:= &&\ \frac{1}{T}\integral{0}{T}{ f(x)\exp\curvb{ -\frac{2\pi i}{T}kx } }{x} \\
+					&\forall x\in\SR:\quad &f(x) &:= &&\ \sum_{k\in\SZ}\FF f(k)\exp\curvb{ \frac{2\pi i}{T}kx }
+				\end{alignat*}
+			\end{definition*}
+
+			Die Fouriertransformation spaltet damit gerade eine periodische Funktion $f$ in sogenannte Frequenzanteile auf.
+			Ein solcher Frequenzanteil beschreibt dann, zu welchem Anteil die harmonische Schwingung $\exp(i\omega\cdot)$ der angegebenen Frequenz $\omega/2\pi$ in der Funktion vorkommt.
+			
+			Diese Transformation lässt sich auch noch für andere Funktionen einführen.
+			Für eine genauere Betrachtung der dahinter stehenden Mathematik sei hier auf die Quellen \cite{stein-fa} und \cite{elstrodt-mit} verwiesen.
+
+		% subsection fouriertransformation_periodischer_funktionen (end)
+
+		\subsection{Diskrete Fouriertransformation} % (fold)
+		\label{sub:diskrete_fouriertransformation}
+
+			Bekannterweise lassen sich in einem Computer Reihen fast immer nur approximieren, da die Addition unendlich vieler Glieder ungleich Null in endlicher Zeit auf endlichem Speicherplatz nicht durchführbar ist.
+			Aus diesem Grund führt man die diskrete Fouriertransformation ein, welche in gewisser Weise eine Näherung der Vorhergehenden ist.
+
+			Es sei nun immer $n\in\SN$ und $\mathrm{N}_{n} := \curlb{0,\ldots,n-1}$.
+			Misst man in der Realität nun einen Zusammenhang $f$, so lässt sich diese nur näherungsweise durch Stützstellen $x_0,\ldots,x_{n-1} \in [0,T)$ mit den zugehörigen Funktionswerten $f(x_0),\ldots,f(x_{n-1})$ beschreiben.
+			In diesen und folgenden Betrachtungen sollen alle Stützstellen als äquidistant angenommen werden.
+			Die Funktion wurde diskretisiert.
+			Man definiert nun
+			\[ g:\mathrm{N}_n\longrightarrow\SC,\qquad g(k):=f(x_k) \]
+			$g$ stellt damit ein Element des $\SC^n$ dar.
+			Es lässt sich also jede diskretisierte Funktion als komplexer $n$-dimensionaler Vektor darstellen.
+			Weiterhin sei für alle $x,y\in\SC^n$
+			\[ \angleb{\cdot,\cdot}:\SC^n\times\SC^n\longrightarrow\SC,\qquad \angleb{x,y}:=\frac{1}{n}\sum_{j=0}^{n-1} \overline{x(i)}y(i) \]
+			Die Abbildung $\angleb{\cdot,\cdot}$ definiert gerade das Standardskalarprodukt des $\SC^n$.
+			Das Tupel $\curvb{ \SC^n, \angleb{\cdot,\cdot} }$ muss dann ein Hilbertraum sein.
+			Dies ermöglicht es eine Orthonormalbasis zu finden.
+			\begin{proposition*}[Orthonormalbasis]
+				Die folgende Menge $D$ bildet eine Orthonormalbasis des $\curvb{ \SC^n, \angleb{\cdot,\cdot} }$.
+				\[ D := \set{\omega_k:\mathrm{N}_n\longrightarrow\SC}{ k\in\mathrm{N}_n,\ \forall x\in\mathrm{N}_n:\ \omega_k(x) = \exp\curvb{\frac{2\pi i}{n}kx} } \]
+
+				% \begin{proof}
+				% 	Seien $k,m \in \curlb{0,\ldots,n-1}$. Dann folgt
+				% 	\begin{align*}
+				% 		\angleb{e^{\frac{2\pi i}{n}k\cdot}, e^{\frac{2\pi i}{n}m\cdot}} &= \frac{1}{n}\sum_{j=0}^{n-1} e^{-\frac{2\pi i}{n}kj} e^{ \frac{2\pi i}{n}mj } \\
+				% 		&= \frac{1}{n}\sum_{j=0}^{n-1} e^{ \frac{2\pi i}{n}j(m-k) }
+				% 	\end{align*}
+				% 	Fall $m=k$:
+				% 	\begin{align*}
+				% 		\angleb{e^{\frac{2\pi i}{n}k\cdot}, e^{\frac{2\pi i}{n}m\cdot}} &= \frac{1}{n} \sum_{j=0}^{n-1} 1 = 1
+				% 	\end{align*}
+				% 	Fall $m\neq k$:
+				% 	\begin{align*}
+				% 		\angleb{e^{\frac{2\pi i}{n}k\cdot}, e^{\frac{2\pi i}{n}m\cdot}} &= \frac{1}{n} \sum_{j=0}^{n-1} \boxb{e^{ \frac{2\pi i}{n}(m-k) }}^j \\
+				% 		\textit{(geometrische Summe)} \quad &= \frac{1}{n}\cdot \frac{e^{2\pi i(m-k)} -1}{e^{\frac{2\pi i}{n}(m-k)} -1} \\
+				% 		\textit{($\exp$ periodisch)} \quad &= 0
+				% 	\end{align*}
+				% 	Damit bildet die betrachtete Menge ein Orthonormalsystem.
+				% 	Diese enthält jedoch gerade $n$ Elemente und ist damit $n$-dimensional.
+				% 	$\SC^n$ ist selbst $n$-dimensional.
+				% 	Damit muss also nach Kenntnissen der linearen Algebra die oben betrachtete Menge eine Orthonormalbasis sein.
+				% \end{proof}
+			\end{proposition*}
+			Nach der Parsevalschen Gleichung lässt sich nun das Element $g$ durch eine Linearkombination der Basisvektoren ausdrücken.
+			\[ \forall x\in\mathrm{N}_n: \ g(x) = \sum_{k=0}^{n-1} \angleb{\omega_k, g} \omega_k(x) \]
+			Die $\angleb{\omega_k, g}$ stellen dabei die Koordinaten von $g$ bezüglich $D$ dar.
+			Diese Koordinaten nennt man nun die diskrete Fouriertransformation oder auch DFT von $g$.
+			Die Parsevalsche Gleichung liefert auch gleich die Inverse.
+
+			\begin{definition*}[diskrete Fouriertransformation]
+				Sei $g:\mathrm{N}_n\longrightarrow\SC$. 
+				Dann ist die diskrete Fouriertransformation $\hat{g}$ von $g$ und deren Inverse definiert durch
+				\begin{alignat*}{4}
+					&\forall k\in\mathrm{N}_n: \ &&\ \hat{g}(k) := \frac{1}{n} &&\sum_{x=0}^{n-1} g(x)\exp\curvb{ -\frac{2\pi i}{n}kx } \\
+					&\forall x\in\mathrm{N}_n: \ &&\ g(x) := &&\sum_{k=0}^{n-1} \hat{g}(k)\exp\curvb{ \frac{2\pi i}{n}xk }
+				\end{alignat*}
+			\end{definition*}
+
+			\textsc{Beispiel:}\\
+			Es sei nun $n=5$ und
+			\[ \forall x\in\mathrm{N}_5: \ g(x):=x \]
+			Tabelle \ref{tab:example} zeigt die Näherungen der berechneten diskreten Fourier-Koeffizienten von $g$.
+
+			\begin{table}[h]
+				\center
+				\setlength{\extrarowheight}{4pt}
+				\begin{tabular}{c|c}
+					\hline
+					$x$ & $\sim\hat{g}(x)$ \\ [1ex]
+					\hline
+					\hline
+					$0$ & $10$ \\
+					$1$ & $-0.5 + 0.688191\,i$ \\
+					$2$ & $-0.5 + 0.162460\,i$ \\
+					$3$ & $-0.5 - 0.162460\,i$ \\
+					$4$ & $-0.5 - 0.688191\,i$ \\
+					\hline
+				\end{tabular}
+				\caption{Fourierkoeffizienten der Beispielfunktion $g$}
+				\label{tab:example}
+			\end{table}
+
+			Die Gleichung der inversen DFT motiviert dazu, die Funktion $g$ nicht nur für $x\in\mathrm{N}_n$ auszuwerten, sondern auch für $x\in\SR$.
+			Dafür definiert man das folgende trigonometrische Polynom
+			\[ p_n:\SR\longrightarrow\SC,\qquad p_n(x) = \sum_{k=-\floorb{n/2}}^{\ceilb{n/2 - 1}} \hat{g}(k) \exp\curvb{ \frac{2\pi i}{n}kx } \]
+			Dieses trigonometrische Polynom interpoliert die Stützpunkte der Funktion $g$.
+			Abbildung \ref{fig:example} stellt $p_5$ und die Stützpunkte dar.
+
+			\begin{figure}[h]
+				\center
+				\input{example-2}
+				\caption{trigonometrisches Polynom und Stützpunkte der Beispielfunktion $g$ }
+				\label{fig:example}
+			\end{figure}
+			
+		% subsection diskrete_fouriertransformation (end)
+
+	% section mathematische_grundlagen (end)
+
+	\section{Serieller Algorithmus} % (fold)
+	\label{sec:serieller_algorithmus}
+
+		\subsection{Idee der Fast Fourier Transform} % (fold)
+		\label{sub:idee_der_fast_fourier_transform}
+		
+			Im Folgenden bezeichne $W(n)$ die Anzahl der Operationen (hier $+,\cdot$), die ein gegebener Algorithmus in Abhängigkeit der Eingabegröße $n$ ausführt.
+
+			Für einen naiven Algorithmus, der nach obiger Formel die DFT von $g$ berechnet, gilt nun
+			\[ W(n) = \underbrace{n(n+1)}_{\mathclap{\mathrm{Multiplikation}}} + \underbrace{n(n-1)}_{\mathclap{\mathrm{Addition}}} = 2n^2 \in \Omega\curvb{n^2} \]
+			Dabei wurde die Berechnung der Faktoren $e^{-i\xi}$, die auch Twiddle-Faktoren genannt werden, nicht beachtet.
+			Diese können durch geeignete Tabellenwerte, die dem Programm vorab zur Verfügung gestellt werden, direkt abgelesen werden.
+			Die Berechnung muss nun für alle $n$ Koeffizienten durchgeführt werden.
+
+			Um diese Laufzeitkomplexität zu verbessern, teilt man die Berechnung der DFT in gerade und ungerade Summanden ein.
+			Es sei nun $n=2m$ für ein $m\in\SN$ und $\FF_n$ bezeichne die DFT auf dem Raum $\SC^n$.
+			Für $k\in\mathrm{N}_n$ folgt
+			\begin{alignat*}{3}
+				\FF_ng(k) &=&& \ \frac{1}{n}\sum_{x=0}^{n-1} g(x)\exp\curvb{ -\frac{2\pi i}{n}kx } \\
+				&=&& \ \frac{1}{n} \boxb{ \sum_{x=0}^{m-1} f(2x)e^{-\frac{2\pi i}{n}2kx} + \sum_{x=0}^{m-1} f(2x+1)e^{-\frac{2\pi i}{n}k(2x+1)} } \\
+				&=&& \ \frac{1}{2}\boxb{\frac{1}{m} \sum_{x=0}^{m-1} g(2x)e^{-\frac{2\pi i}{m}kx} + e^{-\frac{\pi i}{m}k} \frac{1}{m} \sum_{x=0}^{m-1} g(2x+1)e^{-\frac{2\pi i}{m}kj}}
+			\end{alignat*}
+			Für $k<m$ können diese beiden Summen durch diskrete Fouriertransformationen für $m$ Punkte ersetzt werden.
+			\begin{alignat*}{3}
+				g_0:\mathrm{N}_m\longrightarrow\SC,\qquad g_0(x) &:=&& \ g(2x) \\
+				g_1:\mathrm{N}_m\longrightarrow\SC,\qquad g_1(x) &:=&& \ g(2x+1)
+			\end{alignat*}
+			\begin{alignat*}{5}
+				&\FF_n g(k) &&=&& \ \frac{1}{2}\curvb{\FF_m g_0(k) + e^{-\frac{\pi i}{m}k} \ \FF_m g_1(k)} \\
+				&\FF_n g(k+m) &&=&& \ \frac{1}{2}\curvb{\FF_m g_0(k) - e^{-\frac{\pi i}{m}k} \ \FF_m g_1(k)}
+			\end{alignat*}
+			% \end{tcolorbox}
+			Das Ausführen der Fouriertransformation für $n$ Punkte wird also auf die Ausführung zweier Fouriertransformationen für $n/2$ Punkte zurückgeführt.
+			Man möchte nun durch ein rekursives Wiederholen dieser Prozedur die Laufzeitkomplexität verbessern.
+			Aus diesem Grund wird nun hier und im Folgenden $n=2^p$ für ein $p\in\SN$ gesetzt.
+			Dadurch sind exakt $p$ rekursive Schritte mögliche.
+
+			\begin{proposition*}[Zeitkomplexität]
+				Gilt $W(1)=0$ und
+				\[ \forall k\in\mathrm{N}_m:\quad W(2k) = 2W(k) + 4k \]
+				so folgt für die explizite Darstellung der Zeitkomplexität
+				\[ W(n) = 2n\log_2n \in \Omega(n\log_2n) \]
+			\end{proposition*}
+
+			Auch bei der angegebenen Proposition werden die Twiddle-Faktoren nicht beachtet.			
+			Mithilfe dieses Algorithmus erfährt die Berechnung der DFT eine signifikante Beschleunigung.
+			Algorithmen, welche bei der Berechnung der DFT diese Zeitkomplexität aufweisen, werden im allgemeinen Fast Fourier Transform oder auch FFT genannt.
+
+		% subsection idee_der_fast_fourier_transform (end)
+
+		\subsection{Rekursiver Algorithmus} % (fold)
+		\label{sub:rekursiver_algorithmus}
+		
+			Ein erster einfacher FFT-Algorithmus ergibt sich nun direkt aus den oben beschriebenen rekursiven Gleichungen.
+			% Dieser Algorithmus arbeitet, wie auch die Gleichungen, durch einen rekursiven Aufruf von sich selbst.
+			Um dies in der gegebenen Sprache zu verwirklichen ist eine zusätzliche Prozedur im Programm nötig.
+
+			\begin{tcolorbox}[colframe=black,colbacktitle=white,coltitle=black, attach boxed title to top center={yshift=-2mm},enhanced, titlerule=0.1pt, boxrule=0.5pt, arc=5pt,title=Listing:\quad rekursiver FFT-Algorithmus]
+				\input{fft-r}
+			\end{tcolorbox}
+
+			% \begin{tcolorbox}[colframe=black,colbacktitle=white,coltitle=black, attach boxed title to top center={yshift=-2mm},enhanced, titlerule=0.1pt, boxrule=0.5pt, arc=5pt,title=Listing:\quad rekursiver FFT-Algorithmus Teil 2]
+			% 	\input{fft-r-2}
+			% \end{tcolorbox}			
+
+		% subsection rekursiver_algorithmus (end)
+
+		\newpage
+
+		\subsection{Von Bit-Reversal zu Butterfly} % (fold)
+		\label{sub:von_bit_reversal_zu_butterfly}
+		
+			Um aus dem oben beschriebenen Algorithmus einen nicht-rekursiven Algorithmus zu erstellen, ist eine genau Analyse nötig.
+			Diese soll anhand eines Beispiels veranschaulicht werden.
+			Es sei dafür $p=3$ und damit $n=8$.
+			Das Eingabearray $b$ besitzt also $8$ Elemente.
+			In jedem rekursiven Aufruf werden die Werte von $b$ mit geraden und ungeraden Indizes in zwei neue Eingabearrays aufgespalten.
+			Dies wird solange wiederholt, bis die Länge des Eingabearrays $1$ beträgt.
+			Am Ende wird dann nur noch auf einem permutierten Array $\tilde{b}$ mit $\tilde{b}[t]:=b[\sigma_p(t)]$ gearbeitet.
+			Abbildung \ref{fig:bit-reversal} veranschaulicht dies.
+			Stellt man nun alle Indizes im Binärformat mit $p$ Stellen dar, so ergibt sich zum Beispiel
+			\begin{alignat*}{3}
+				0 = (000)_2 \quad\stackrel{\sigma_p}{\longrightarrow}\quad 0 = (000)_2 \\
+				1 = (001)_2 \quad\stackrel{\sigma_p}{\longrightarrow}\quad 4 = (100)_2 \\
+				2 = (010)_2 \quad\stackrel{\sigma_p}{\longrightarrow}\quad 2 = (010)_2 \\
+				3 = (011)_2 \quad\stackrel{\sigma_p}{\longrightarrow}\quad 6 = (110)_2 \\
+				4 = (100)_2 \quad\stackrel{\sigma_p}{\longrightarrow}\quad 1 = (001)_2 \\
+				5 = (101)_2 \quad\stackrel{\sigma_p}{\longrightarrow}\quad 5 = (101)_2 \\
+				6 = (110)_2 \quad\stackrel{\sigma_p}{\longrightarrow}\quad 3 = (011)_2 \\
+				7 = (111)_2 \quad\stackrel{\sigma_p}{\longrightarrow}\quad 7 = (111)_2
+			\end{alignat*}
+			Die Binärdarstellungen der Indizes wird also gerade umgekehrt.
+			Dies gilt nicht nur für den Spezialfall $p=3$, sonder für alle $p$.
+
+			\begin{proposition*}[Bit-Reversal Map]
+				Sei $t\in\mathrm{N}_{2^p}$ mit der Binärdarstellung $(\alpha_{p-1}\ldots\alpha_0)_2$.
+				Dann ergibt sich nach obigen Definitionen für die Binärdarstellung von $\sigma_p(t)$
+				\[ (\alpha_0\ldots\alpha_{p-1})_2 \]
+				$\sigma_p$ wird dann auch als Bit-Reversal Map bezeichnet.
+			\end{proposition*}
+
+			\begin{figure}[p]
+				\center
+				\input{bit-reverse-scheme}
+				\caption{Bit-Reversal Map: \\ Funktionsweise des rekursiven FFT-Algorithmus bis zum Erreichen der Abbruchbedingung für $p=3$}
+				\label{fig:bit-reversal}
+			\end{figure}
+
+			Der zweite Teil des rekursiven Algorithmus lässt sich durch Abbildung \ref{fig:butterfly} veranschaulichen.
+			Nachdem alle Instanzen der Prozedur aufgerufen wurden, muss jetzt das Matrix-Vektor-Produkt berechnet werden.
+			Die einzelnen $+$ in der Abbildung stehen für die Berechnung der ersten Zeile.
+			Die einzelnen $-$ stehen also für die zweite Zeile.
+			Dieses Schema wird auch Schmetterlingsgraph oder Butterfly Graph genannt.
+
+			\begin{figure}[p]
+				\center
+				\input{butterfly-scheme}
+				\caption{Butterfly Graph: \\ Funktionsweise des rekursiven FFT-Algorithmus nach dem Erreichen der Abbruchbedingung für $p=3$}
+				\label{fig:butterfly}
+			\end{figure}
+
+		% subsection von_bit_reversal_zu_butterfly (end)
+
+		\newpage
+
+		\subsection{Nicht-Rekursiver Algorithmus} % (fold)
+		\label{sub:nicht_rekursiver_algorithmus}
+		
+			Durch die oben beschriebene Analyse führt nun auf den folgenden nicht-rekursiven Algorithmus.
+
+			\begin{tcolorbox}[colframe=black,colbacktitle=white,coltitle=black, attach boxed title to top center={yshift=-2mm},enhanced, titlerule=0.1pt, boxrule=0.5pt, arc=5pt,title=Listing:\quad nicht-rekursiver FFT-Algorithmus]
+				\input{fft-s}
+			\end{tcolorbox}
+
+		% subsection nicht_rekursiver_algorithmus (end)
+
+	% section serieller_algorithmus (end)
+
+	\section{Paralleler Algorithmus} % (fold)
+	\label{sec:paralleler_algorithmus}
+	
+		\subsection{Verteilung der Daten} % (fold)
+		\label{sub:verteilung_der_daten}
+
+			Die Länge des Eingabearrays beträgt $n=2^p$.
+			Will man nun den nicht-rekursiven Algorithmus parallelisieren, so ist es durchaus sinnvoll für die Anzahl der Prozesse ebenfalls eine Potenz von $2$ zu verwenden.
+			Es sei also $P=2^q$ für ein $q\in\SN$ mit $q\leq p$ die Anzahl der Prozesse.
+			Um die Arbeit nun möglichst gleichmäßig zu verteilen, soll nun jeder Prozess gerade $2^{p-q}$ Elemente speichern.
+			Abbildung \ref{fig:data-distribution} stellt diese Verteilung für $p=3$ und $q=2$ dar.
+
+			\begin{figure}[h]
+				\center
+				\input{data-distribution-scheme}
+				\caption{Verteilung des Eingabearrays $\tilde{b}$ auf den Prozessen $\rho_i$ für $p=3,q=2$}
+				\label{fig:data-distribution}
+			\end{figure}
+
+			Damit reichen die lokalen Indizes des Arrays $\tilde{b}$ bezüglich eines Prozesses von $0$ bis $2^{p-q}-1$.
+			Ein globaler Index $u\in\mathrm{N}_{2^p}$ bezüglich eines Prozessindex $v\in\mathrm{N}_{2^q}$ und eines lokalen Index $w\in\mathrm{N}_{2^{p-q}}$ ergibt sich dann zu
+			\[ u = 2^{p-q}v + w \]
+			Bezeichnet man die zugehörigen Binärdarstellungen mit $(u_p\ldots u_1)_2, (v_q\ldots v_1)_2$ und $(w_{p-q}\ldots w_1)_2$ so folgt dann
+			\[ (u_p\ldots u_1)_2 = (v_q\ldots v_1 w_{p-q}\ldots w_1)_2 \]
+			Die ersten $q$ Bits des globalen Index bezeichnen den Prozessindex und die Restlichen den lokalen Index bezüglich dieses Prozesses.
+
+		
+		% subsection verteilung_der_daten (end)
+
+		\subsection{Kommunikation und Algorithmus} % (fold)
+		\label{sub:kommunikation_und_algorithmus}
+
+			Man wendet jetzt den Butterfly-Algorithmus auf diese Datenverteilung an (siehe Abbildung \ref{fig:butterfly-parallel}).
+			Es gibt dann Teilschritte, die keine Kommunikation zwischen den Prozessen benötigen.
+			Für diese Schritte benötigen die Berechnungen nur Werte des eigenen Prozesses.
+			Dies gilt für alle $m\in\SN_0$ mit $m<p-q$, sofern die $m$ die im Algorithmus beschriebene Zählvariable bezeichnet.
+
+			Für alle anderen Schritte muss ein Prozess immer genau mit einem anderen kommunizieren.
+			Hierbei muss jeder Prozess alle lokal gespeicherten Werte versenden und alle gespeicherten Werte des anderen Prozesses empfangen.
+			Dann kann prinzipiell wieder das Matrix-Vektor-Produkt berechnet werden.
+			Allerdings muss darauf geachtet werden, dass jeweils eine Zeile durch einen Prozess berechnet wird.
+
+			\begin{figure}[h]
+				\center
+				\input{butterfly-parallel-scheme}
+				\caption{Funktionsweise eines Butterfly Graph auf mehreren Prozessen am Beispiel von $p=3,q=2$}
+				\label{fig:butterfly-parallel}
+			\end{figure}
+
+			Im folgenden Algorithmus wurde der Zugriff auf die Twiddle-Faktoren abkürzend durch $\xi(m,p,t)$ beschrieben, da die Verteilung solcher Faktoren im Allgemeinen beliebig sein kann.
+
+			\begin{tcolorbox}[colframe=black,colbacktitle=white,coltitle=black, attach boxed title to top center={yshift=-2mm},enhanced, titlerule=0.1pt, boxrule=0.5pt, arc=5pt,title=Listing:\quad paralleler FFT-Algorithmus]
+				\input{fft-p}
+			\end{tcolorbox}
+		
+		% subsection kommunikation_und_algorithmus (end)
+
+		\subsection{Leistungsanalyse} % (fold)
+		\label{sub:leistungsanalyse}
+		
+			Während der Ausführung des Algorithmus gibt es genau $p-q$ Teilschritte, in denen nicht kommuniziert wird.
+			Bezeichnet man die durchschnittliche Durchführungszeit einer Computeroperation mit $\tau_\mathrm{A}$, dann ergibt sich die Zeit der Teilschritte ohne Kommunikation zu
+			\[ 2^{p-q+1}(p-q)\tau_\mathrm{A} \]
+			Für die anderen $q$ Teilschritte ergibt sich die reine Berechnungszeit analog.
+			\[ 2^{p-q+1}q\tau_\mathrm{A} \]
+			Es werden $2q$ Kommunikationen durchgeführt, welche alle $2^{p-q}$ Daten verschicken.
+			Die reine Kommunikationszeit ergibt sich zu
+			\[ q\curvb{ 2\tau_\mathrm{S} + 2^{p-q+1}\beta } \]
+			Sei nun $T(n,P)$ die Gesamtzeit der Berechnung.
+			\[ \boxed{ T(n,P) = 2\frac{n}{P}\curvb{ \tau_\mathrm{A}\log_2 n + \beta\log_2 P } + 2\tau_\mathrm{S}\log_2 P } \]
+			Der sogenannte Speedup gibt nun eine Aussage darüber, für welches Verhältnis $n/P$ die größte Beschleunigung erlangt werden kann.
+			\[ \boxed{S(n,P):=\frac{T(n,1)}{T(n,P)} = \frac{P}{ 1 + \frac{\log_2 P}{\log_2 n}\curvb{ \frac{\beta}{\tau_\mathrm{A}} + \frac{P}{n}\frac{\tau_{\mathrm{S}}}{\tau_{\mathrm{A}}} } }} \]
+			Der Koeffizient $\frac{\tau_{\mathrm{S}}}{\tau_{\mathrm{A}}}$ wird im Allgemeinen vergleichsweise groß sein.
+			Damit sind Berechnungen mit $P \ll n$ sehr effizient und Berechnungen mit $P\approx n$ dagegen nicht.
+
+		% subsection leistungsanalyse (end)
+
+	% section paralleler_algorithmus (end)
+
+	\nocite{velde-csc}
+	\nocite{hermann-nm}
+	\nocite{wiki-cooley-ffta}
+	\nocite{wiki-fft}
+	\nocite{fftw-p}
+
+	\bibliography{references}
+
+\end{document}

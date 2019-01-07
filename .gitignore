@@ -1,0 +1,13 @@
+*
+!*/
+!*.pdf
+!*.tex
+!*.png
+!*.txt
+!*.eps
+!*.gnuplot-config
+!*.gnuplot-data
+!*.cpp
+!*.bib
+!README.md
+!.gitignore

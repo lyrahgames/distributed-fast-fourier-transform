@@ -1,0 +1,15 @@
+\begin{tabbing}
+	\quad\=\quad\=\quad\=\kill
+	$\mathbf{program} \textrm{ Recursive-FFT}$\\
+	$\mathbf{declare}$\\
+		\>$\mathbf{procedure} \textrm{ fft}(\mathit{out},\mathit{in}\ :\ \mathrm{array}[0..2^{q}-1-1] \textrm{ of complex}\ ;\ q\ :\ \mathrm{integer});$ \\
+		\>$t\ :\ \textrm{integer}\ ;$\\
+		\>$\omega,b,c\ :\ \mathrm{array}[0..2^{p}-1] \textrm{ of complex}$\\
+	$\mathbf{initially}$\\
+		\>$\color{MidnightBlue}\curlb{\textit{\ttfamily look-up table for twiddle factors}}$\\
+		\>$\langle \ ;\ t\ :\ 0\leq t<2^p\ ::\ \omega[t] = \exp(-\frac{2\pi it}{n})\ \rangle\ ;$\\
+		\>$\langle \ ;\ t\ :\ 0\leq t<2^p\ ::\ b[t] = g(t)\ \rangle$\\
+	$\mathbf{assign}$\\
+		\>$\mathrm{fft}(c,b,p)$\\
+	$\mathbf{end}$\\
+\end{tabbing}

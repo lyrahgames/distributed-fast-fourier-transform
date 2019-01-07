@@ -1,0 +1,18 @@
+\begin{tabbing}
+	\quad\=\quad\=\quad\=\kill
+	$\color{MidnightBlue}\curlb{\textit{\ttfamily extra procedure for recursive algorithm}}$\\
+	$\mathbf{procedure} \textrm{ fft}(\mathit{out},\mathit{in}\ :\ \mathrm{array}[0..2^{q}-1-1] \textrm{ of complex}\ ;\ q\ :\ \mathrm{integer})$ \\
+	$\mathbf{begin}$\\
+		\>$\mathbf{if}\ q=0\ \mathbf{then}$\\
+			\>\>$\mathit{out}[0] = \mathit{in}[0]$\\
+		\>$\mathbf{else}\ \mathbf{begin}$\\
+		% \>$$\\
+			\>\>$\mathrm{fft}(\mathit{out}[0..2^{q-1}-1]\ ,\ \mathit{in}[0..2..2^{q}-2]\ ,\ q-1);$\\
+			\>\>$\mathrm{fft}(\mathit{out}[2^{q-1}..2^q-1]\ ,\ \mathit{in}[1..2..2^{q}-1]\ ,\ q-1);$\\
+			% \\
+			\>\>$\langle \ \|\ t\ :\ 0\leq t<2^{q-1}\ ::$\\
+				\>\>\>$\boxb{ \begin{array}{l} b[t] \\ b[t+2^{q-1}] \end{array} } := \dfrac{1}{2} \boxb{ \begin{array}{lr} 1 & \omega[2^{p-q}t] \\ 1 & -\omega[2^{p-q}t] \end{array} }\boxb{ \begin{array}{l} b[t] \\ b[t+2^{q-1}] \end{array} }$\\
+			\>\>$\rangle$\\
+		\>$\mathbf{end}$\\
+	$\mathbf{end}$\\
+\end{tabbing}

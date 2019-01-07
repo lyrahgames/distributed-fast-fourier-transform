@@ -1,0 +1,31 @@
+set terminal epslatex size 12cm,7cm
+set output "example-beamer.tex"
+
+set xl '$x$'
+set yl '$y$'
+
+f(x) = sin(x)*cos(x)/x + 0.1*cos(5*x) + x - 3
+
+set xr [0:6]
+set yr [-2:2]
+
+set xtics 1
+set ytics 2
+
+#set grid
+set key box
+set key height 1
+set key bottom
+#set key outside center bottom
+
+
+
+set samples 20
+set table 'tmp.dat'
+plot f(x)
+unset table
+set samples 10000
+plot f(x) linecolor rgb '#dd181f' linetype 1 linewidth 4 title 'Funktion', \
+	'tmp.dat' using 1:2 with points pt 13 title 'Stützpunkte'
+
+#pause mouse

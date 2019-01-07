@@ -1,0 +1,38 @@
+\begin{tabbing}
+	\quad\=\quad\=\quad\=\kill
+	$\mathbf{program} \textrm{ Serial-FFT}$\\
+	$\mathbf{declare}$\\
+		% \>$\mathbf{procedure} \textrm{ fft}(\mathit{out},\mathit{in}\ :\ \mathrm{array}[0..2^{q}-1-1] \textrm{ of complex}\ ;\ q\ :\ \mathrm{integer});$ \\
+		\>$m,t\ :\ \textrm{integer}\ ;$\\
+		\>$\omega,b\ :\ \mathrm{array}[0..2^{p}-1] \textrm{ of complex}$\\
+	$\mathbf{initially}$\\
+		\>$\color{MidnightBlue}\curlb{\textit{\ttfamily look-up table for twiddle factors}}$\\
+		\>$\langle \ ;\ t\ :\ 0\leq t<2^p\ ::\ \omega[t] = \exp(-\frac{2\pi it}{n})\ \rangle\ ;$\\
+		\>$\color{MidnightBlue}\curlb{\textit{\ttfamily bit-reverse ordering}}$\\
+		\>$\langle \ ;\ t\ :\ 0\leq t<2^p\ ::\ b[t] = g(\sigma_p(t))\ \rangle$\\
+	$\mathbf{assign}$\\
+		% \>$\mathrm{fft}(c,b,p)$\\
+		\>$\color{MidnightBlue}\curlb{\textit{\ttfamily butterfly calculation}}$\\
+		\>$\langle \ ;\ m\ :\ 0\leq m<p\ ::$\\
+			\>\>$\langle \ \|\ t\ :\ 0\leq t<2^{p}-1\ \mathbf{and}\ t\wedge 2^m=0\ ::$\\
+				\>\>\>$\boxb{ \begin{array}{l} b[t] \\ b[t+2^m] \end{array} } := \dfrac{1}{2} \boxb{ \begin{array}{lr} 1 & \omega[2^{p-m-1}t\ \mathrm{mod}\ 2^{p-1}] \\ 1 & -\omega[2^{p-m-1}t\ \mathrm{mod}\ 2^{p-1}] \end{array} }\boxb{ \begin{array}{l} b[t] \\ b[t+2^m] \end{array} }$\\
+			\>\>$\rangle$\\
+		\>$\rangle$\\
+	$\mathbf{end}$\\
+	% \\
+	% \\
+	% $\mathbf{procedure} \textrm{ fft}(\mathit{out},\mathit{in}\ :\ \mathrm{array}[0..2^{q}-1-1] \textrm{ of complex}\ ;\ q\ :\ \mathrm{integer})$ \\
+	% $\mathbf{begin}$\\
+	% 	\>$\mathbf{if}\ q=0\ \mathbf{then}$\\
+	% 		\>\>$\mathit{out}[0] = \mathit{in}[0]$\\
+	% 	\>$\mathbf{else}$\\
+	% 	\>$\mathbf{begin}$\\
+	% 		\>\>$\mathrm{fft}(\mathit{out}[0..2^{q-1}-1]\ ,\ \mathit{in}[0..2..2^{q}-2]\ ,\ q-1);$\\
+	% 		\>\>$\mathrm{fft}(\mathit{out}[2^{q-1}..2^q-1]\ ,\ \mathit{in}[1..2..2^{q}-1]\ ,\ q-1);$\\
+	% 		\\
+	% 		\>\>$\langle \ \|\ t\ :\ 0\leq t<2^{q-1}\ ::$\\
+	% 			\>\>\>$\boxb{ \begin{array}{l} b[t] \\ b[t+2^{q-1}] \end{array} } := \dfrac{1}{2} \boxb{ \begin{array}{lr} 1 & \omega[2^{p-q}t] \\ 1 & -\omega[2^{p-q}t] \end{array} }\boxb{ \begin{array}{l} b[t] \\ b[t+2^{q-1}] \end{array} }$\\
+	% 		\>\>$\rangle$\\
+	% 	\>$\mathbf{end}$\\
+	% $\mathbf{end}$\\
+\end{tabbing}

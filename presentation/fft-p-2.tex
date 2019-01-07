@@ -1,0 +1,18 @@
+\begin{tabbing}
+	\quad\=\quad\=\quad\=\quad\=\kill
+		\>$\color{MidnightBlue}\curlb{\textit{\ttfamily butterfly calculation with communication}}$\\
+		\>$\langle \ ;\ m\ :\ 0\leq m<q\ ::$\\
+			\>\>$\mathbf{send}\ \set{b[t]}{0\leq t<2^{p-q}}\ \mathbf{to}\ \rho\bar{\vee}2^m\ ;$\\
+			\>\>$\mathbf{receive}\ \set{x[t]}{0\leq t<2^{p-q}}\ \mathbf{from}\ \rho\bar{\vee}2^m\ ;$\\
+			% \>\>$\langle \ ;\ t\ :\ 0\leq t<2^{p-q}-1\ \mathbf{and}\ t\wedge 2^m=0\ ::$\\
+			\>\>$\mathbf{if}\ \rho\wedge 2^m=0\ \mathbf{then}$\\
+				\>\>\>$\langle \ ;\ t\ :\ 0\leq t<2^{p-q}\ \mathbf{and}\ t\wedge 2^m=0\ ::$\\
+					\>\>\>\>$b[t]:=\frac{1}{2}\curvb{b[t] + \omega[\xi(m,\rho, t)]x[t]}\ \rangle$\\
+			\>\>$\mathbf{else}$\\
+				\>\>\>$\langle \ ;\ t\ :\ 0\leq t<2^{p-q}\ \mathbf{and}\ t\wedge 2^m=0\ ::$\\
+					\>\>\>\>$b[t]:=\frac{1}{2}\curvb{x[t] - \omega[\xi(m,\rho, t)]b[t]}\ \rangle$\\
+			\>\>$\mathbf{end}$\\
+			% \>\>$\rangle$\\
+		\>$\rangle$\\
+	$\mathbf{end}$\\
+\end{tabbing}

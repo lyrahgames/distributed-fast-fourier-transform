@@ -1,0 +1,34 @@
+\begin{tabbing}
+	\quad\=\quad\=\quad\=\kill
+	$\mathbf{program} \textrm{ Recursive-FFT}$\\
+	$\mathbf{declare}$\\
+		\>$\mathbf{procedure} \textrm{ fft}(\mathit{out},\mathit{in}\ :\ \mathrm{array}[0..2^{q}-1-1] \textrm{ of complex}\ ;\ q\ :\ \mathrm{integer});$ \\
+		\>$t\ :\ \textrm{integer}\ ;$\\
+		\>$\omega,b,c\ :\ \mathrm{array}[0..2^{p}-1] \textrm{ of complex}$\\
+	$\mathbf{initially}$\\
+		\>$\color{MidnightBlue}\curlb{\textit{\ttfamily look-up table for twiddle factors}}$\\
+		\>$\langle \ ;\ t\ :\ 0\leq t<2^p\ ::\ \omega[t] = \exp(-\frac{2\pi it}{n})\ \rangle\ ;$\\
+		\>$\langle \ ;\ t\ :\ 0\leq t<2^p\ ::\ b[t] = g(t)\ \rangle$\\
+	$\mathbf{assign}$\\
+		\>$\mathrm{fft}(c,b,p)$\\
+	$\mathbf{end}$\\
+	% \\
+	\\
+	$\color{MidnightBlue}\curlb{\textit{\ttfamily extra procedure for recursive algorithm}}$\\
+	$\mathbf{procedure} \textrm{ fft}(\mathit{out},\mathit{in}\ :\ \mathrm{array}[0..2^{q}-1-1] \textrm{ of complex}\ ;\ q\ :\ \mathrm{integer})$ \\
+	$\mathbf{begin}$\\
+		\>$\mathbf{if}\ q=0\ \mathbf{then}$\\
+			\>\>$\mathit{out}[0] = \mathit{in}[0]$\\
+		\>$\mathbf{else}\ \mathbf{begin}$\\
+		% \>$$\\
+			\>\>$\mathrm{fft}(\mathit{out}[0..2^{q-1}-1]\ ,\ \mathit{in}[0..2..2^{q}-2]\ ,\ q-1);$\\
+			\>\>$\mathrm{fft}(\mathit{out}[2^{q-1}..2^q-1]\ ,\ \mathit{in}[1..2..2^{q}-1]\ ,\ q-1);$\\
+			% \\
+			\>\>$\langle \ \|\ t\ :\ 0\leq t<2^{q-1}\ ::$\\
+				\>\>\>$\boxb{ \begin{array}{l} b[t] \\ b[t+2^{q-1}] \end{array} } := \dfrac{1}{2} \boxb{ \begin{array}{lr} 1 & \omega[2^{p-q}t] \\ 1 & -\omega[2^{p-q}t] \end{array} }\boxb{ \begin{array}{l} b[t] \\ b[t+2^{q-1}] \end{array} }$\\
+			\>\>$\rangle$\\
+		\>$\mathbf{end}$\\
+	$\mathbf{end}$\\
+\end{tabbing}
+
+

@@ -1,0 +1,37 @@
+\begin{tabbing}
+	\quad\=\quad\=\quad\=\quad\=\kill
+	$0..2^q-1\ \|\ \rho\ \mathbf{program} \textrm{ Parallel-FFT}$\\
+	$\mathbf{declare}$\\
+		% \>$\mathbf{procedure} \textrm{ fft}(\mathit{out},\mathit{in}\ :\ \mathrm{array}[0..2^{q}-1-1] \textrm{ of complex}\ ;\ q\ :\ \mathrm{integer});$ \\
+		\>$m,t\ :\ \textrm{integer}\ ;$\\
+		\>$\omega\ :\ \mathrm{array}[0..2^{p}-1] \textrm{ of complex}\ ;$\\
+		\>$b,x\ :\ \mathrm{array}[0..2^{p-q}-1] \textrm{ of complex}$\\
+	$\mathbf{initially}$\\
+		\>$\color{MidnightBlue}\curlb{\textit{\ttfamily look-up table for twiddle factors}}$\\
+		\>$\langle \ ;\ t\ :\ 0\leq t<2^p\ ::\ \omega[t] = \exp(-\frac{2\pi it}{n})\ \rangle\ ;$\\
+		\>$\color{MidnightBlue}\curlb{\textit{\ttfamily bit-reverse ordering}}$\\
+		\>$\langle \ ;\ t\ :\ 0\leq t<2^{p-q}\ ::\ b[t] = g(\sigma_p(2^{p-q}\rho + t))\ \rangle$\\
+	$\mathbf{assign}$\\
+		% \>$\mathrm{fft}(c,b,p)$\\
+		\>$\color{MidnightBlue}\curlb{\textit{\ttfamily butterfly calculation with no communication}}$\\
+		\>$\langle \ ;\ m\ :\ 0\leq m<p-q\ ::$\\
+			\>\>$\langle \ ;\ t\ :\ 0\leq t<2^{p-q}\ \mathbf{and}\ t\wedge 2^m=0\ ::$\\
+				\>\>\>$\boxb{ \begin{array}{l} b[t] \\ b[t+2^m] \end{array} } := \dfrac{1}{2} \boxb{ \begin{array}{lr} 1 & \omega[\xi(m,\rho, t)] \\ 1 & -\omega[\xi(m,\rho, t)] \end{array} }\boxb{ \begin{array}{l} b[t] \\ b[t+2^m] \end{array} }$\\
+			\>\>$\rangle$\\
+		\>$\rangle\ ;$\\
+		\>$\color{MidnightBlue}\curlb{\textit{\ttfamily butterfly calculation with communication}}$\\
+		\>$\langle \ ;\ m\ :\ 0\leq m<q\ ::$\\
+			\>\>$\mathbf{send}\ \set{b[t]}{0\leq t<2^{p-q}}\ \mathbf{to}\ \rho\bar{\vee}2^m\ ;$\\
+			\>\>$\mathbf{receive}\ \set{x[t]}{0\leq t<2^{p-q}}\ \mathbf{from}\ \rho\bar{\vee}2^m\ ;$\\
+			% \>\>$\langle \ ;\ t\ :\ 0\leq t<2^{p-q}-1\ \mathbf{and}\ t\wedge 2^m=0\ ::$\\
+			\>\>$\mathbf{if}\ \rho\wedge 2^m=0\ \mathbf{then}$\\
+				\>\>\>$\langle \ ;\ t\ :\ 0\leq t<2^{p-q}\ \mathbf{and}\ t\wedge 2^m=0\ ::$\\
+					\>\>\>\>$b[t]:=\frac{1}{2}\curvb{b[t] + \omega[\xi(m,\rho, t)]x[t]}\ \rangle$\\
+			\>\>$\mathbf{else}$\\
+				\>\>\>$\langle \ ;\ t\ :\ 0\leq t<2^{p-q}\ \mathbf{and}\ t\wedge 2^m=0\ ::$\\
+					\>\>\>\>$b[t]:=\frac{1}{2}\curvb{x[t] - \omega[\xi(m,\rho, t)]b[t]}\ \rangle$\\
+			\>\>$\mathbf{end}$\\
+			% \>\>$\rangle$\\
+		\>$\rangle$\\
+	$\mathbf{end}$\\
+\end{tabbing}
